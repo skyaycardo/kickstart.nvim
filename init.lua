@@ -1,33 +1,4 @@
---[[
-
-=====================================================================
-==================== READ THIS BEFORE CONTINUING ====================
-=====================================================================
-========                                    .-----.          ========
-========         .----------------------.   | === |          ========
-========         |.-""""""""""""""""""-.|   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||   KICKSTART.NVIM   ||   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||                    ||   |-----|          ========
-========         ||:Tutor              ||   |:::::|          ========
-========         |'-..................-'|   |____o|          ========
-========         `"")----------------(""`   ___________      ========
-========        /::::::::::|  |::::::::::\  \ no mouse \     ========
-========       /:::========|  |==hjkl==:::\  \ required \    ========
-========      '""""""""""""'  '""""""""""""'  '""""""""""'   ========
-========                                                     ========
-=====================================================================
-=====================================================================
-
-What is Kickstart?
-
-  Kickstart.nvim is *not* a distribution.
-
-  Kickstart.nvim is a starting point for your own configuration.
-    The goal is that you can read every line of code, top-to-bottom, understand
-    what your configuration is doing, and modify it to suit your needs.
-
+--[[ ===================================================================== ==================== READ THIS BEFORE CONTINUING ==================== ===================================================================== ========                                    .-----.          ======== ========         .----------------------.   | === |          ======== ========         |.-""""""""""""""""""-.|   |-----|          ======== ========         ||                    ||   | === |          ======== ========         ||   KICKSTART.NVIM   ||   |-----|          ======== ========         ||                    ||   | === |          ======== ========         ||                    ||   |-----|          ======== ========         ||:Tutor              ||   |:::::|          ======== ========         |'-..................-'|   |____o|          ======== ========         `"")----------------(""`   ___________      ======== ========        /::::::::::|  |::::::::::\  \ no mouse \     ======== ========       /:::========|  |==hjkl==:::\  \ required \    ======== ========      '""""""""""""'  '""""""""""""'  '""""""""""'   ======== ========                                                     ======== ===================================================================== ===================================================================== What is Kickstart? Kickstart.nvim is *not* a distribution. Kickstart.nvim is a starting point for your own configuration. The goal is that you can read every line of code, top-to-bottom, understand what your configuration is doing, and modify it to suit your needs.
     Once you've done that, you can start exploring, configuring and tinkering to
     make Neovim your own! That might mean leaving Kickstart just the way it is for a while
     or immediately breaking it into modular pieces. It's up to you!
@@ -88,7 +59,7 @@ P.S. You can delete this when you're done too. It's your config now! :)
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.g.maplocalleader = ','
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = false
@@ -102,7 +73,7 @@ vim.g.have_nerd_font = false
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -131,7 +102,7 @@ vim.opt.smartcase = true
 -- Keep signcolumn on by default
 vim.opt.signcolumn = 'yes'
 
--- Decrease update time
+vim.opt.relativenumber = true
 vim.opt.updatetime = 250
 
 -- Decrease mapped sequence wait time
@@ -256,6 +227,40 @@ require('lazy').setup({
     },
   },
 
+  {
+    'Olical/conjure',
+    ft = { 'clojure', 'fennel', 'python' },
+    lazy = true,
+    init = function()
+      -- Set configuration options here
+      -- Uncomment this to get verbose logging to help diagnose internal Conjure issues
+      -- This is VERY helpful when reporting an issue with the project
+      -- vim.g["conjure#debug"] = true
+    end,
+
+    -- Optional cmp-conjure integration
+    dependencies = { 'PaterJason/cmp-conjure' },
+  },
+  {
+    'PaterJason/cmp-conjure',
+    lazy = true,
+    config = function()
+      local cmp = require 'cmp'
+      local config = cmp.get_config()
+      table.insert(config.sources, { name = 'conjure' })
+      return cmp.setup(config)
+    end,
+  },
+  {
+    'stevearc/oil.nvim',
+    ---@module 'oil'
+    ---@type oil.SetupOpts
+    opts = {},
+    -- Optional dependencies
+    dependencies = { { 'echasnovski/mini.icons', opts = {} } },
+    -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if prefer nvim-web-devicons
+    vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' }),
+  },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -270,7 +275,6 @@ require('lazy').setup({
   -- Then, because we use the `config` key, the configuration only runs
   -- after the plugin has been loaded:
   --  config = function() ... end
-
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
@@ -607,7 +611,7 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -836,7 +840,6 @@ require('lazy').setup({
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       vim.cmd.colorscheme 'tokyonight-night'
-
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
     end,
@@ -888,7 +891,22 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'fennel',
+        'clojure',
+        'python',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
